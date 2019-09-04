@@ -15,7 +15,17 @@ train_subjects <- read.table("UCI HAR Dataset/train/subject_train.txt", col.name
 train <- train_subjects 
 Y_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = c("Y"))
 train <- bind_cols(train, Y_train)
+
 X_train <- read.table("UCI HAR Dataset/train/X_train.txt")
+X_train_filtered <- X_train %>% select(-(303:344), -(382:423))
+features <- read.table("UCI HAR Dataset/features.txt")
+features_V2 <- as.character(features$V2)
+features_filtered <- c(features_V2[1:302], features_V2[345:381],  features_V2[424:561])
+
+names(X_train_filtered) <- features_filtered
+X_train_filtered_mean <- X_train %>% select(contains("mean"))
+
+
 train <- getSdAndMean(X_train, train, "X")
 body_acc_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt")
 train <- getSdAndMean(body_acc_x_train, train, "body_acc_x")
