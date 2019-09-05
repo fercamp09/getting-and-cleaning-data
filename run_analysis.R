@@ -11,67 +11,44 @@ getSdAndMean <- function(dataframe, df, name){
   df
 }
 
-train_subjects <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names = c("subject"))
-train <- train_subjects 
-Y_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = c("Y"))
-train <- bind_cols(train, Y_train)
+# Read dataset
+features <- read.table("../data/UCI HAR Dataset/features.txt")
+activities <- read.table("../data/UCI HAR Dataset/activity_labels.txt")
+names(activities) = c("activity_code", "activity")
 
-X_train <- read.table("UCI HAR Dataset/train/X_train.txt")
-X_train_filtered <- X_train %>% select(-(303:344), -(382:423))
-features <- read.table("UCI HAR Dataset/features.txt")
+Y_activity_train <- read.table("../data/UCI HAR Dataset/train/y_train.txt", col.names = c("activity_code"))
+X_train <- read.table("../data/UCI HAR Dataset/train/X_train.txt")
+train_subjects <- read.table("../data/UCI HAR Dataset/train/subject_train.txt", col.names = c("subject"))
+train <- bind_cols(train_subjects, Y_activity_train)
+
+Y_activity_test <- read.table("../data/UCI HAR Dataset/test/y_test.txt",  col.names = c("activity_code"))
+X_test <- read.table("../data/UCI HAR Dataset/test/X_test.txt")
+test_subjects <- read.table("../data/UCI HAR Dataset/test/subject_test.txt", col.names = c("subject"))
+test <- bind_cols(test_subjects, Y_activity_test)
+
+# Filter dataset repeated columns names
 features_V2 <- as.character(features$V2)
-features_filtered <- c(features_V2[1:302], features_V2[345:381],  features_V2[424:561])
+features_filtered <- c(features_V2[1:302], features_V2[345:381],  features_V2[424:460],  features_V2[503:561])
 
+X_train_filtered <- X_train %>% select(-(303:344), -(382:423),  -(461:502))
+X_test_filtered <- X_test %>% select(-(303:344), -(382:423),  -(461:502))
 names(X_train_filtered) <- features_filtered
-X_train_filtered_mean <- X_train %>% select(contains("mean"))
+names(X_test_filtered) <- features_filtered
 
+# Merge test and training dataset
+merged <- bind_rows(X_train_filtered, X_test_filtered)
+merged_add_info <- bind_rows(train, test)
+complete_mean <- merged %>% select(contains("mean"))
+complete_std <- merged %>% select(contains("std"))
+complete <- bind_cols(merged_add_info, complete_mean, complete_std)
+step4 <- left_join(activities, complete, by = NULL, copy=FALSE)
 
-train <- getSdAndMean(X_train, train, "X")
-body_acc_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt")
-train <- getSdAndMean(body_acc_x_train, train, "body_acc_x")
-body_acc_y_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_y_train.txt")
-train <- getSdAndMean(body_acc_y_train, train, "body_acc_y")
-body_acc_z_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_z_train.txt")
-train <- getSdAndMean(body_acc_z_train, train, "body_acc_z")
-body_gyro_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_gyro_x_train.txt")
-train <- getSdAndMean(body_gyro_x_train, train, "body_gyro_x")
-body_gyro_y_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_gyro_y_train.txt")
-train <- getSdAndMean(body_gyro_y_train, train, "body_gyro_y")
-body_gyro_z_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_gyro_z_train.txt")
-train <- getSdAndMean(body_gyro_z_train, train, "body_gyro_z")
-total_acc_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt")
-train <- getSdAndMean(total_acc_x_train, train, "total_acc_x")
-total_acc_y_train <- read.table("UCI HAR Dataset/train/Inertial Signals/total_acc_y_train.txt")
-train <- getSdAndMean(total_acc_y_train, train, "total_acc_y")
-total_acc_z_train <- read.table("UCI HAR Dataset/train/Inertial Signals/total_acc_z_train.txt")
-train <- getSdAndMean(total_acc_z_train, train, "total_acc_z")
+# Group by subject and activity and compute the mean for each 
+grouped <- complete %>% group_by(subject, activity_code) %>% summarise_all(mean)
+tidy_dataset <- left_join(activities, grouped, by = NULL, copy=FALSE)
 
-test_subjects <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names = c("subject"))
-test <- test_subjects
-Y_test <- read.table("UCI HAR Dataset/test/y_test.txt",  col.names = c("Y"))
-test <- bind_cols(test, Y_test)
-X_test <- read.table("UCI HAR Dataset/test/X_test.txt")
-test <- getSdAndMean(X_test, test, "X")
-body_acc_x_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_acc_x_test.txt")
-test <- getSdAndMean(body_acc_x_test, test, "body_acc_x")
-body_acc_y_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_acc_y_test.txt")
-test <- getSdAndMean(body_acc_y_test, test, "body_acc_y")
-body_acc_z_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_acc_z_test.txt")
-test <- getSdAndMean(body_acc_z_test, test, "body_acc_z")
-body_gyro_x_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_gyro_x_test.txt")
-test <- getSdAndMean(body_gyro_x_test, test, "body_gyro_x")
-body_gyro_y_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_gyro_y_test.txt")
-test <- getSdAndMean(body_gyro_y_test, test, "body_gyro_y")
-body_gyro_z_test <- read.table("UCI HAR Dataset/test/Inertial Signals/body_gyro_z_test.txt")
-test <- getSdAndMean(body_gyro_z_test, test, "body_gyro_z")
-total_acc_x_test <- read.table("UCI HAR Dataset/test/Inertial Signals/total_acc_x_test.txt")
-test <- getSdAndMean(total_acc_x_test, test, "total_acc_x")
-total_acc_y_test <- read.table("UCI HAR Dataset/test/Inertial Signals/total_acc_y_test.txt")
-test <- getSdAndMean(total_acc_y_test, test, "total_acc_y")
-total_acc_z_test <- read.table("UCI HAR Dataset/test/Inertial Signals/total_acc_z_test.txt")
-test <- getSdAndMean(total_acc_z_test, test, "total_acc_z")
+# Write tidy dataset to a file
+write.table(tidy_dataset, "tidy_dataset.txt", row.names = FALSE)
 
-complete <- bind_rows(train, test)
-
-grouped <- complete %>% group_by(subject, Y) %>% summarise_all(mean)
-write.table(grouped, "tidy_dataset.txt", row.names=FALSE)
+# body_acc_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt")
+# train <- getSdAndMean(body_acc_x_train, train, "body_acc_x")
