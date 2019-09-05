@@ -1,6 +1,17 @@
 # getting-and-cleaning-data
 Course project for getting and cleaning data, course on the data science John Hopkins specialization
 
+How to run the analysis
+======================================
+The data should be in the same folder as the run_analysis.R
+
+Replace PATH_TO_FILE with your actual path
+In R: source('/PATH TO FILE/run_analysis.R')
+
+The output file is called tidy_dataset.txt, found in the same folder after running the code.
+Codebook
+======================================
+
 Each row contains the average of each variable for each activity and each subject.
 ======================================
 

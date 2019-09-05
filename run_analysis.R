@@ -12,18 +12,18 @@ getSdAndMean <- function(dataframe, df, name){
 }
 
 # Read dataset
-features <- read.table("../data/UCI HAR Dataset/features.txt")
-activities <- read.table("../data/UCI HAR Dataset/activity_labels.txt")
+features <- read.table("UCI HAR Dataset/features.txt")
+activities <- read.table("UCI HAR Dataset/activity_labels.txt")
 names(activities) = c("activity_code", "activity")
 
-Y_activity_train <- read.table("../data/UCI HAR Dataset/train/y_train.txt", col.names = c("activity_code"))
-X_train <- read.table("../data/UCI HAR Dataset/train/X_train.txt")
-train_subjects <- read.table("../data/UCI HAR Dataset/train/subject_train.txt", col.names = c("subject"))
+Y_activity_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = c("activity_code"))
+X_train <- read.table("UCI HAR Dataset/train/X_train.txt")
+train_subjects <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names = c("subject"))
 train <- bind_cols(train_subjects, Y_activity_train)
 
-Y_activity_test <- read.table("../data/UCI HAR Dataset/test/y_test.txt",  col.names = c("activity_code"))
-X_test <- read.table("../data/UCI HAR Dataset/test/X_test.txt")
-test_subjects <- read.table("../data/UCI HAR Dataset/test/subject_test.txt", col.names = c("subject"))
+Y_activity_test <- read.table("UCI HAR Dataset/test/y_test.txt",  col.names = c("activity_code"))
+X_test <- read.table("UCI HAR Dataset/test/X_test.txt")
+test_subjects <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names = c("subject"))
 test <- bind_cols(test_subjects, Y_activity_test)
 
 # Filter dataset repeated columns names
@@ -49,6 +49,6 @@ tidy_dataset <- left_join(activities, grouped, by = NULL, copy=FALSE)
 
 # Write tidy dataset to a file
 write.table(tidy_dataset, "tidy_dataset.txt", row.names = FALSE)
-
+head(tidy_dataset)
 # body_acc_x_train <- read.table("UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt")
 # train <- getSdAndMean(body_acc_x_train, train, "body_acc_x")
