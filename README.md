@@ -9,6 +9,7 @@ Replace PATH_TO_FILE with your actual path
 In R: source('/PATH TO FILE/run_analysis.R')
 
 The output file is called tidy_dataset.txt, found in the same folder after running the code.
+
 Codebook
 ======================================
 
